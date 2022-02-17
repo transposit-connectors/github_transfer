@@ -12,28 +12,34 @@
   const response_url = parsed_body.response_url;
 
   setImmediate(() => {
-    let user = api.user({type: "slack", workspaceId, userId});
+    let user = api.user({ type: "slack", workspaceId, userId });
     if (user) {
-      console.log(user)
+      console.log(user);
       var text_match = /(\S+) (\S+)/.exec(parsed_body.text.trim());
       if (text_match) {
-		let message = api.run('this.transfer_file', { source_url: text_match[1], target_url: text_match[2] }, {asUser: user.id})[0];
+        let message = api.run(
+          "this.transfer_file",
+          { source_url: text_match[1], target_url: text_match[2] },
+          { asUser: user.id }
+        )[0];
         api.run("slack_webhook.post_to_response_url", {
           response_url: response_url,
-          post_body: {text: message}
-        });      
+          post_body: { text: message },
+        });
       } else {
         api.run("slack_webhook.post_to_response_url", {
           response_url: response_url,
-          post_body: {text: "Couldn't parse the source and target urls."}
-        });      
+          post_body: { text: "Couldn't parse the source and target urls." },
+        });
       }
     } else {
       api.run("slack_webhook.post_to_response_url", {
         response_url: response_url,
-        post_body: {text: 'Please configure your user at ' +  env.getBuiltin().appUrl}
-      });      
+        post_body: {
+          text: "Please configure your user at " + env.getBuiltin().appUrl,
+        },
+      });
     }
   });
   return { status_code: 200 };
-}
+};
