@@ -1,111 +1,135 @@
 {
   "v2": {
     "transposit": {
-      "dependencies": [{
-        "name": "transposit/slack_webhook:v1.*.*",
-        "alias": "slack_webhook"
-      }, {
-        "name": "transposit/github:v3.*.*",
-        "alias": "github"
-      }],
-      "operations": [{
-        "id": "webhook",
-        "function": {
-          "parameters": [{
-            "name": "http_event",
-            "default": {
-              "text": "{   \"query_parameters\": {     \"api_key\": \"XXX\"   },   \"http_method\": \"POST\",   \"parsed_body\": {     \"channel_name\": \"XXX\",     \"user_id\": \"UXXX\",     \"user_name\": \"iggy\",     \"trigger_id\": \"XXX\",     \"team_domain\": \"my_domain\",     \"team_id\": \"TXXX\",     \"text\": \"\",     \"channel_id\": \"DXXX\",     \"command\": \"/test\",     \"token\": \"XXX\",     \"response_url\": \"https://hooks.slack.com/commands/TXXX/XXX/XXX\"   },   \"body\": \"token=XXX&team_id=TXXX&team_domain=my_domain&channel_id=DXXX&channel_name=XXX&user_id=UXXX&user_name=iggy&command=%2Ftest&text=&response_url=https%3A%2F%2Fhooks.slack.com%2Fcommands%2FTXXX%2FXXX%2FXXX&trigger_id=XXX\" }"
-            },
-            "type": "OBJECT"
-          }],
-          "js": "webhook.js"
+      "dependencies": [
+        {
+          "name": "transposit/slack_webhook:v1.*.*",
+          "alias": "slack_webhook"
         },
-        "access": {
-          "requireApiKey": true,
-          "webhook": true
+        {
+          "name": "transposit/github:v3.*.*",
+          "alias": "github"
         }
-      }, {
-        "id": "find_blob_object",
-        "function": {
-          "parameters": [{
-            "name": "owner",
-            "type": "STRING"
-          }, {
-            "name": "repo",
-            "type": "STRING"
-          }, {
-            "name": "branch",
-            "type": "STRING"
-          }, {
-            "name": "path",
-            "default": {
-              "text": "."
-            },
-            "type": "STRING",
-            "required": true
-          }, {
-            "name": "filename",
-            "type": "STRING"
-          }],
-          "js": "find_blob_object.js"
+      ],
+      "operations": [
+        {
+          "id": "webhook",
+          "function": {
+            "parameters": [
+              {
+                "name": "http_event",
+                "default": {
+                  "text": "{   \"query_parameters\": {     \"api_key\": \"XXX\"   },   \"http_method\": \"POST\",   \"parsed_body\": {     \"channel_name\": \"XXX\",     \"user_id\": \"UXXX\",     \"user_name\": \"iggy\",     \"trigger_id\": \"XXX\",     \"team_domain\": \"my_domain\",     \"team_id\": \"TXXX\",     \"text\": \"\",     \"channel_id\": \"DXXX\",     \"command\": \"/test\",     \"token\": \"XXX\",     \"response_url\": \"https://hooks.slack.com/commands/TXXX/XXX/XXX\"   },   \"body\": \"token=XXX&team_id=TXXX&team_domain=my_domain&channel_id=DXXX&channel_name=XXX&user_id=UXXX&user_name=iggy&command=%2Ftest&text=&response_url=https%3A%2F%2Fhooks.slack.com%2Fcommands%2FTXXX%2FXXX%2FXXX&trigger_id=XXX\" }"
+                },
+                "type": "OBJECT"
+              }
+            ],
+            "js": "webhook.js"
+          },
+          "access": {
+            "requireApiKey": true,
+            "webhook": true
+          }
+        },
+        {
+          "id": "find_blob_object",
+          "function": {
+            "parameters": [
+              {
+                "name": "owner",
+                "type": "STRING"
+              },
+              {
+                "name": "repo",
+                "type": "STRING"
+              },
+              {
+                "name": "branch",
+                "type": "STRING"
+              },
+              {
+                "name": "path",
+                "default": {
+                  "text": "."
+                },
+                "type": "STRING",
+                "required": true
+              },
+              {
+                "name": "filename",
+                "type": "STRING"
+              }
+            ],
+            "js": "find_blob_object.js"
+          }
+        },
+        {
+          "id": "transfer_file",
+          "function": {
+            "parameters": [
+              {
+                "name": "source_url",
+                "description": "Github URL of the source file",
+                "type": "STRING",
+                "required": true
+              },
+              {
+                "name": "target_url",
+                "description": "Github URL of the target file",
+                "type": "STRING",
+                "required": true
+              }
+            ],
+            "js": "transfer_file.js"
+          }
         }
-      }, {
-        "id": "transfer_file",
-        "function": {
-          "parameters": [{
-            "name": "source_url",
-            "description": "Github URL of the source file",
-            "type": "STRING",
-            "required": true
-          }, {
-            "name": "target_url",
-            "description": "Github URL of the target file",
-            "type": "STRING",
-            "required": true
-          }],
-          "js": "transfer_file.js"
-        }
-      }],
-      "dataConnections": [{
-        "ref": "slack_identify.raw",
-        "overrides": {
-          "swagger": {
-            "oauthConfig": {
-              "scope": "identity.basic"
-            },
-            "executionLimits": {
+      ],
+      "dataConnections": [
+        {
+          "ref": "slack_identify.raw",
+          "overrides": {
+            "swagger": {
+              "oauthConfig": {
+                "scope": "identity.basic"
+              },
+              "executionLimits": {}
+            }
+          },
+          "title": "Slack",
+          "description": "Used to identify you on Slack"
+        },
+        {
+          "ref": "slack_bot.raw",
+          "overrides": {
+            "swagger": {
+              "oauthConfig": {
+                "scope": "chat:write:bot"
+              },
+              "executionLimits": {}
             }
           }
         },
-        "title": "Slack",
-        "description": "Used to identify you on Slack"
-      }, {
-        "ref": "slack_bot.raw",
-        "overrides": {
-          "swagger": {
-            "oauthConfig": {
-              "scope": "chat:write:bot"
-            },
-            "executionLimits": {
-            }
-          }
+        {
+          "ref": "slack.raw"
+        },
+        {
+          "ref": "google_calendar.raw",
+          "requireConsumerSignin": true
+        },
+        {
+          "ref": "github.raw",
+          "requireConsumerSignin": true
         }
-      }, {
-        "ref": "slack.raw"
-      }, {
-        "ref": "google_calendar.raw",
-        "requireConsumerSignin": true
-      }, {
-        "ref": "github.raw",
-        "requireConsumerSignin": true
-      }],
+      ],
       "javascriptAPIVersion": "3",
       "source": "src",
-      "userSettings": [{
-        "name": "committer_email",
-        "description": "Email address for github commits. If not set, we will use the email address set in your github profile.",
-        "type": "STRING"
-      }],
+      "userSettings": [
+        {
+          "name": "committer_email",
+          "description": "Email address for github commits. If not set, we will use the email address set in your github profile.",
+          "type": "STRING"
+        }
+      ],
       "userSettingsDisplay": "GENERATED"
     },
     "description": "Transfer files between repos using a Slack slash command",
